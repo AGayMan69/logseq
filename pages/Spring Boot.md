@@ -105,7 +105,6 @@ tags: library
 		  ```
 		- the `SpringBootApplication` annotation enables ((16878a34-21df-4673-972c-2b651eb05550)), ((72a77874-b10a-4e45-ab49-dfc8ef949cbc)), ((13787f0d-c9cb-4e04-9c30-b5c1d79836b6))
 	- ### ((6468d77f-398c-4d6b-9ab2-d506340cd43a))
-		- i love porn
 		- #### `@Component`
 		  id:: 6468cd17-958a-4541-9fd0-d096c75d1812
 			- ```java
