@@ -35,7 +35,7 @@
  :ui/show-full-blocks? true
 
  ;; Expand block references automatically when zoom-in
- :ui/auto-expand-block-refs? false
+ :ui/auto-expand-block-refs? true
 
  ;; Enable Block timestamp
  :feature/enable-block-timestamps? false
@@ -247,7 +247,7 @@
  :ref/linked-references-collapsed-threshold 50
 
  ;; Favorites to list on the left sidebar
- :favorites []
+ :favorites ["Spring Boot"]
 
  ;; any number between 0 and 1 (the greater it is the faster the changes of the next-interval of card reviews) (default 0.5)
  ;; :srs/learning-fraction 0.5
@@ -344,7 +344,8 @@
  ;;     ;use triple underscore `___` for slash `/` in page title
  ;;     ;use Percent-encoding for other invalid characters
  :file/name-format :triple-lowbar
- :graph/settings {:builtin-pages? false, :orphan-pages? true, :excluded-pages? true, :journal? false}
+ :graph/settings {:builtin-pages? false, :orphan-pages? false, :excluded-pages? true, :journal? false}
+ :ui/show-brackets? false
 
  ;; specify the format of the filename for journal files
  ;; :journal/file-name-format "yyyy_MM_dd"

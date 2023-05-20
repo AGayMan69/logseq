@@ -1,0 +1,15 @@
+- ==Auto configuration==
+	- `@EnableAutoConfiguration` enables [[Spring Boot]]'s auto-configuration support
+-
+- ==Component scanning==
+	- `@ComponentScan` enables [[Spring Boot]]'s component scanning of **current package** and scan sub-packages recursively
+	-
+	- By default, [[Spring Boot]] starts component scanning from the **same package** as your main Spring Boot application, and **sub-packages** recursively
+	- Implicitly defines a base search package, which means no need to explicitly reference the base package name
+	- For other packages to scan by [[Spring Boot]], use [scanBasePackages](Spring Boot/Annotation/Component Scanning/scanBasePackages) to explicitly to list the base packages to scan
+	  id:: f3e69d32-9c9a-4d24-bc1a-76b5a6635be8
+	- {{embed ((6469225e-31a8-4670-ae15-ba7514a69f50))}}
+-
+- ==Additional configuration==
+	- `@Configuration` enables [[Spring Boot]] to register extra beans with `@Bean` or import other configuration classes
+-

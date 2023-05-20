@@ -344,7 +344,8 @@
  ;;     ;use triple underscore `___` for slash `/` in page title
  ;;     ;use Percent-encoding for other invalid characters
  :file/name-format :triple-lowbar
- :graph/settings {:builtin-pages? false, :orphan-pages? true, :excluded-pages? true, :journal? true}
+ :graph/settings {:builtin-pages? false, :orphan-pages? false, :excluded-pages? true, :journal? false}
+ :ui/show-brackets? false
 
  ;; specify the format of the filename for journal files
  ;; :journal/file-name-format "yyyy_MM_dd"
