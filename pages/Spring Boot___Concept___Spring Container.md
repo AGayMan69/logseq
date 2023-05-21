@@ -1,0 +1,7 @@
+- Create and manage objects [(Inversoin of Control)](Spring Boot/Concept/Inversion of Control (IoC))
+- Inject object dependencies [Dependency Injection](Spring Boot/Concept/Dependency Injection)
+-
+- **Configuring Spring Container**
+	- XML configuration file (legacy)
+	- [[Spring Boot/Annotation]]
+	- [[Spring Boot/Source Code]]
