@@ -1,0 +1,3 @@
+- > [@Repository](Spring Boot/Annotation/JPA/Repository) applied to [[Data Access Object (DAO)]] implementations, Spring will automatically register the implementation
+- Spring will also translate the [JDBC](Spring Boot/Concept/Data Persistence/JDBC) checked exceptions into **unchecked exceptions**
+-

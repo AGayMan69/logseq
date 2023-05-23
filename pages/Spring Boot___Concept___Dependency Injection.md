@@ -21,7 +21,7 @@
 	- **How it normally works**
 		- Create a spring bean using [@Component](Spring Boot/Annotation/Dependency Injection/Component)
 		- {{embed ((6469174d-6f97-4114-b3e0-d86505ca8f2e))}}
-		- Add annotation to the constructor using [@Autowired](Spring Boot/Annotation/Dependency Injection/Autowired)
+		- Add annotation to the setter using [@Autowired](Spring Boot/Annotation/Dependency Injection/Autowired)
 		- {{embed ((1aed9080-9f1e-43d9-9fb4-a0ce9757f3e3))}}
 	-
 	- **It can also inject to any method name**

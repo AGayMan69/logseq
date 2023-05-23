@@ -1,0 +1,6 @@
+- > Hibernate is a framework persisting Java objects in a database
+-
+- **Pros**
+	- Handles all of the low-level SQL
+	- Minimizes the amount of [JDBC](Spring Boot/Concept/Data Persistence/JDBC) code
+	- provides [[Object Relatoinal Mapping (ORM)]]

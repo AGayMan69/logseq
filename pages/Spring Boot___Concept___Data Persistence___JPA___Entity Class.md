@@ -1,0 +1,4 @@
+- > Java class that is mapped to a database table
+- Must be annotated with [@Entity](Spring Boot/Annotation/JPA/Entity)
+- Must have a public or protected no-argument constructor
+-

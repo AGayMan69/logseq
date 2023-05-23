@@ -1,0 +1,8 @@
+- > JPA Entity Manager is the main component for saving / retrieving entities
+- {{renderer excalidraw, excalidraw-2023-05-23-18-44-50}}
+-
+- For doing that, the Entity Manager need a Data source
+	- Data source defines the database connection info
+-
+- JPA Entity Manager and Data Source are created by Spring Boot automatically Based on the file: [application.properties](Spring Boot/Configuration/application.properties)
+	- {{embed ((646ce6e5-6aa8-49d3-81d2-eeaa05ddaef2))}}

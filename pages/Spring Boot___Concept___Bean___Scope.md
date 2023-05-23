@@ -1,5 +1,5 @@
 - #+BEGIN_NOTE
-  [Spring Container](Spring Boot/Concept/Spring Container) default only create one instance of the [Bean](Spring Boot/Concept/Bean) **([[Design Pattern/Singleton]])**
+  [Spring Container](Spring Boot/Concept/Spring Container) default only create one instance of the [Bean](Spring Boot/Concept/Bean) **([[Singleton]])**
   #+END_NOTE
 - | Scope | Usage |
   |---|---|

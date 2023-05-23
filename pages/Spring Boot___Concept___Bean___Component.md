@@ -1,0 +1,2 @@
+- [@Component](Spring Boot/Annotation/Component) have a few descendant such as [@RestController](Spring Boot/Concept/Bean/Component/RestController), [@Respository](Spring Boot/Concept/Bean/Component/Repository)
+- {{renderer excalidraw, excalidraw-2023-05-23-19-24-17}}

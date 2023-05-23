@@ -1,0 +1,1 @@
+- > [@Transactional](Spring Boot/Annotation/JPA/Transactional) annotation automatically begin and end a transaction for the JPA code

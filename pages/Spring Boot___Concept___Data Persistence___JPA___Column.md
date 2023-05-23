@@ -1,0 +1,5 @@
+- > The use of `@Column` is optional
+- If not specified, the column name is the same as the Java field name
+	- However, if refactoring the code it may not matching the existing database field
+	- Same as [@Entity](Spring Boot/Annotation/JPA/Table) which match the existing database table
+-

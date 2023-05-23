@@ -1,0 +1,13 @@
+- **Jakarta Persistence API** (JPA) ... *previously known as* **Java Persistence API**
+- Standard API for [[Object Relatoinal Mapping (ORM)]]
+-
+- It is only a specification which
+	- Defines a set of interfaces
+	- Requires an implementation to be usable
+-
+- **There are few vender implementation...**
+	- [Hibernate](Spring Boot/Concept/Data Persistence/Hibernate), [EclipseLink](Spring Boot/Concept/Data Persistence/EclipseLink), [Apache OpenJPA](Spring Boot/Concept/Data Persistence/Apache OpenJPA), etc ...
+-
+- **Benefits**
+	- coding to JPA spec (interfaces)
+	- can theoretically switch to different vendor implementations

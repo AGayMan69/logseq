@@ -1,0 +1,7 @@
+- > Make the existing third-party class available to the Spring framework
+- Typically, if we need make class as a java bean, we have to add [@Component](Spring Boot/Concept/Bean/Component) to the class's source code
+- But with the third-party class, we are not able to change the source code of the class
+- **How it works**
+	- Create `@Configuration` class
+	- Define `@Bean` method to configure the bean
+	- For example, see [[Spring Boot/Annotation/Bean/Java Config Bean]]
