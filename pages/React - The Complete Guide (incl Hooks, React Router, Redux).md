@@ -548,4 +548,329 @@
 			  ```
 - #### Section 5: React LIst & Conditional content
   id:: 6472005c-32d1-405a-ae78-73c6fabe5250
+	- Understanding *"Keys"* #React/State
+		- Working with array of data, if we not passing *key* to generate a list component, Whenever the array content changed, React will simply **revisit** the list of content and update the content to match the array
+		- Here is the example of generating components with *key*, *key* is a special `props` that can add to any component
+			- ```jsx
+			  {props.items.map((expense) => (
+			    <ExpenseItem
+			      key={expense.id}
+			      title={expense.title}
+			      amount={expense.amount}
+			      date={expense.date}
+			    />
+			  ))}
+			  ```
+		- #+BEGIN_IMPORTANT
+		  Don't use `index` from array.map() as the `index` is not directly attached to the content of the item
+		  #+END_IMPORTANT
+	- Output conditional content #React/State
+		- Create an variable `expensesContent` to store default value
+			- ```jsx
+			   let expensesContent = <p>No expenses found.</p>;
+			  ```
+		- Conditional statement to check the `filteredExpenses` affect by the state `filteredYear`
+			- `filteredExpenses`
+				- ```jsx
+				  const filteredExpenses = props.items.filter((expense) => {
+				    return expense.date.getFullYear().toString() === filteredYear;
+				  });
+				  ```
+			- `filteredYear`
+				- ```jsx
+				  if (filteredExpenses.length > 0) {
+				    expensesContent = filteredExpenses.map((expense) => (
+				      <ExpenseItem
+				        key={expense.id}
+				        title={expense.title}
+				        amount={expense.amount}
+				        date={expense.date}
+				      />
+				    ));
+				  }
+				  ```
+			- ```jsx
+			  return (
+			    <Card className="expenses">
+			      <ExpensesFilter
+			        selected={filteredYear}
+			        onChangeFilter={filterChangeHandler}
+			      />
+			      {expensesContent}
+			    </Card>
+			  );
+			  ```
+	- Passing style in jsx #React/Component #React/Styling
+		- In ==jsx== style are passed as an `object`
+			- ```jsx
+			  <div
+			    className="chart-bar__fill"
+			    style={{ height: barFillHeight }}
+			  ></div>
+			  ```
+		- #+BEGIN_NOTE
+		  For long property name with `-` like `background-color`, the property need to wrap with `''` e.g. *`'background-color'`* *or* use camel-case *`backgroundColor`*
+		  #+END_NOTE
+- #### Section 6: Styling React Components
+  id:: 647881d0-a031-4333-b194-3ecb50c83dec
+	- #+BEGIN_IMPORTANT
+	  By default in *React*, the imported css styles are **not scoped**, that's mean the styles are **spilled** throughout the entire project.
+	  #+END_IMPORTANT
+	- #### Styled Components #React/Styling #Styled-Comopnents
+	  collapsed:: true
+		- Creating component with *styled components*
+		  collapsed:: true
+			- ```jsx
+			  import styled from "styled-components";
+			  const Button = styled.button`
+			    width: 100%;
+			    font: inherit;
+			    padding: 0.5rem 1.5rem;
+			    border: 1px solid #8b005d;
+			    color: white;
+			    background: #8b005d;
+			    box-shadow: 0 0 4px rgba(0, 0, 0, 0.26);
+			    cursor: pointer;
+			  
+			    @media (min-width: 768px) {
+			      width: auto;
+			    }
+			  
+			    &:focus {
+			      outline: none;
+			    }
+			  
+			    &:hover,
+			    &:active {
+			      background: #ac0e77;
+			      border-color: #ac0e77;
+			      box-shadow: 0 0 8px rgba(0, 0, 0, 0.26);
+			    }
+			  `;
+			  ```
+		- Passing `props` to styled component
+		  collapsed:: true
+			- ```jsx
+			        <FormControl invalid={!isValid}>
+			          <label>Course Goal</label>
+			          <input type="text" onChange={goalInputChangeHandler} />
+			        </FormControl>
+			  
+			  ```
+		- Change the value with the `props`
+		  collapsed:: true
+			- ```jsx
+			  const FormControl = styled.div`
+			  	...
+			  
+			    & label {
+			      font-weight: bold;
+			      display: block;
+			      margin-bottom: 0.5rem;
+			      color: ${(props) => (props.invalid ? "red" : "black")};
+			    }
+			  
+			    & input {
+			      display: block;
+			      width: 100%;
+			      border: 1px solid ${(props) => (props.invalid ? "red" : "#ccc")};
+			      background: ${(props) => (props.invalid ? "#ffd7d7" : "transparent")};
+			      font: inherit;
+			      line-height: 1.5rem;
+			      padding: 0 0.25rem;
+			    }
+			  	....
+			  `
+			  ```
+	- #### CSS Module  #React/Styling #CSS/CSS-Module
+	  collapsed:: true
+		- First we need to convert the regular **.css** file to **.module.css** file
+		  collapsed:: true
+			- ![image.png](../assets/image_1685809724222_0.png)
+		- Import css module
+		  collapsed:: true
+			- ```jsx
+			  import styles from "./CourseInput.module.css";
+			  ```
+		- Using the styles class with `styles.prop` or `styles['props']`
+		  collapsed:: true
+			- ```jsx
+			  <button type={props.type} className={styles.button} onClick={props.onClick}>
+			  	...
+			  </button>
+			  ```
+			- ```jsx
+			  <div
+			    className={`${styles["form-control"]} ${!isValid && styles.invalid}`}
+			  >
+			  	...
+			  </div>
+			  ```
 	-
+- #### Section 7: JSX limitation workaround
+  id:: 6481c90c-ee15-48d9-90c5-762defa7a705
+	- #### React Fragment #React/Component
+	  collapsed:: true
+		- #+BEGIN_NOTE
+		  Due to the limitation of jsx, which is a **component should consist of one root element**. Most of the, the app will end of with a lot of unnecessary `<div>`
+		  #+END_NOTE
+		  ![image.png](../assets/image_1686227704745_0.png){:height 218, :width 672}
+		-
+		- Using `React.Fragment`
+		  collapsed:: true
+			- ```jsx
+			  return (
+			    <React.Fragment>
+			      <AddUser onAddUser={addUserHandler} />
+			      <UsersList users={usersList} />
+			    </React.Fragment>
+			  );
+			  ```
+		- Using `<>`
+		  collapsed:: true
+			- ```jsx
+			  return (
+			    <>
+			      <AddUser onAddUser={addUserHandler} />
+			      <UsersList users={usersList} />
+			    </>
+			  );
+			  ```
+	- #### React portals #React/DOM
+	  collapsed:: true
+		- **Portals**, the name has suggested, that act as an portal for the Component to place on another location to improve the semantics of *HTML* ![image.png](../assets/image_1686227977751_0.png){:height 360, :width 1113}
+		- To create the place for the portal, we have to go to `public/index.html` to define
+		  collapsed:: true
+			- ```jsx
+			  <body>
+			      <noscript>You need to enable JavaScript to run this app.</noscript>
+			      <div id="backdrop-root"></div>
+			      <div id="overlay-root"></div>
+			      <div id="root"></div>
+			      <!--
+			        This HTML file is a template.
+			        If you open it directly in the browser, you will see an empty page.
+			  
+			        You can add webfonts, meta tags, or analytics to this file.
+			        The build step will place the bundled scripts into the <body> tag.
+			  
+			        To begin the development, run `npm start` or `yarn start`.
+			        To create a production bundle, use `npm run build` or `yarn build`.
+			      -->
+			    </body>
+			  ```
+		- Import `ReactDOM` inside component
+		  collapsed:: true
+			- ```jsx
+			  import ReactDOM from "react-dom";
+			  ```
+		- Placing the component to the portal with `ReactDOM.createPortal()`
+		  collapsed:: true
+			- ```jsx
+			  {ReactDOM.createPortal(
+			    <Backdrop onConfirm={props.onConfirm} />,
+			    document.getElementById("backdrop-root")
+			  )}
+			  {ReactDOM.createPortal(
+			    <ModalOverlay
+			      onConfirm={props.onConfirm}
+			      title={props.title}
+			      message={props.message}
+			    />,
+			    document.getElementById("overlay-root")
+			  )}
+			  ```
+	- #### React useRef
+	  collapsed:: true
+		- `useRef` allow to access other DOM elements
+		- creating ref
+		  collapsed:: true
+			- ```jsx
+			    const nameInputRef = useRef();
+			    const ageInputRef = useRef();
+			  ```
+		- accessing ref value
+		  collapsed:: true
+			- ```jsx
+			      const enteredName = nameInputRef.current.value;
+			      const enteredUserAge = ageInputRef.current.value;
+			  
+			      if (enteredName.trim().length === 0 || enteredUserAge.trim().length === 0) {
+			  		...
+			      }
+			  
+			  ```
+		- manipulating ref value
+		  collapsed:: true
+			- ```jsx
+			  nameInputRef.current.value = "";
+			  ageInputRef.current.value = "";
+			  ```
+			- #+BEGIN_WARNING
+			  Except reset the input value, you **should not** manipulate the DOM without React
+			  #+END_WARNING
+	- #### Controlled Components, Uncontrolled Components
+	  collapsed:: true
+		- If we access the dom element with `ref`, it's **uncontrolled component**, because it's internal *state* is not controlled by react
+		  collapsed:: true
+			- ```jsx
+			  <input id="username" type="text" ref={nameInputRef} />
+			  <input id="age" type="number" ref={ageInputRef} />
+			  ```
+		- otherwise, like *2-way binding*, we can updating and feed back the state to the component, it's a **controlled component**
+- #### Section 8: Side Effects, Reducer, Context
+  id:: 6481c91f-619f-43cd-86e1-3744b5e65041
+	- #### Side Effects
+		- Here is the main jobs of React
+			- {{renderer excalidraw, excalidraw-2023-06-08-22-08-39}}
+		- Side effects is **anything besides** that
+			- {{renderer excalidraw, excalidraw-2023-06-08-22-14-20}}
+	- #### useEffect #React/Hook #[[React/Side Effect]]
+		- `useEffect(() => { ... }, [ dependencies]);`
+			- the function will be executed after every **component evaluation** and the dependencies change
+		- The following *side effect* run after every component evaluation
+			- ```jsx
+			  useEffect(() => {
+			    console.log("EFFECT RUNNING");
+			  })
+			  ```
+		- The following *side effect* will only run once
+			- ```jsx
+			    useEffect(() => {
+			      const storedUserLoggedInInformation = localStorage.getItem("isLoggedIn");
+			  
+			      if (storedUserLoggedInInformation === "1") {
+			        setIsLoggedIn(true);
+			      }
+			    }, []);
+			  ```
+		- *side effect* with dependencies
+			- ```jsx
+			  useEffect(() => {
+			    setFormIsValid(
+			      enteredEmail.includes("@") && enteredPassword.trim().length > 6
+			    );
+			  }, [enteredEmail, enteredPassword]);
+			  ```
+			- #+BEGIN_IMPORTANT
+			  Whenever you have an action in response to another action that is a *side effect*
+			  Checking and updating that form validity is a *side effect* in response to a keystroke of a input field
+			  #+END_IMPORTANT
+		- **Clean up** function
+			- #+BEGIN_NOTE
+			  `clean up function` run before every new side effect function execution *except the first time*, and before the **component is removed**
+			  #+END_NOTE
+			- Here is the **debouncing** technique to prevent executing too many unnecessary side effect
+				- ```jsx
+				    useEffect(() => {
+				      const identifier = setTimeout(() => {
+				        setFormIsValid(
+				          enteredEmail.includes("@") && enteredPassword.trim().length > 6
+				        );
+				      }, 500);
+				  
+				      return () => {
+				        clearTimeout(identifier);
+				      };
+				    }, [enteredEmail, enteredPassword]);
+				  ```
