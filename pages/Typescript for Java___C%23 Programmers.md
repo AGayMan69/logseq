@@ -64,3 +64,8 @@
 		  let w: Car = new Golfer();
 		  ```
 		- No error occurred because both the *structure* of `Car` and `Golfer` are the same
+	- **Reflection**
+		- #+BEGIN_NOTE
+		  TypeScript's type a fully erased.
+		  Information like *instantiation of a generice type parameter* is not like available at **runtime**
+		  #+END_NOTE
