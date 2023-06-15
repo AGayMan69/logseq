@@ -48,3 +48,19 @@
 		  fn({ k: 10 });
 		  ```
 		- Because `{k: 10}` has all of the properties of `Empty` so it's a valid call
+	- **Identical Types**
+		- ```ts
+		  class Car {
+		    drive() {
+		      // hit the gas
+		    }
+		  }
+		  class Golfer {
+		    drive() {
+		      // hit the ball far
+		    }
+		  }
+		  // No error?
+		  let w: Car = new Golfer();
+		  ```
+		- No error occurred because both the *structure* of `Car` and `Golfer` are the same
