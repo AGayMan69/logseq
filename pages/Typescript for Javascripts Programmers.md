@@ -1,5 +1,5 @@
 - > Author(s): [[N/A]]
-  Url: [[https://www.typescriptlang.org/docs/handbook/typescript-in-5-minutes.html]]
+  Url: [TypeScript: Documentation - TypeScript for JavaScript Programmers (typescriptlang.org)](https://www.typescriptlang.org/docs/handbook/typescript-in-5-minutes.html)
   tags:: #document #programming #[[software development]]
 - #### Types by Inferences #TypeScript/Type
 	- #+BEGIN_NOTE
@@ -68,6 +68,7 @@
 	  |`never`|never this type|
 	  |`void`|function which returns `undefined` or no return value|
 - #### Type & Interfaces #TypeScript/Type #Typescript/Interface
+	- [TypeScript: type vs interface](https://www.typescriptlang.org/play?&e=83#code/PTAEBUAsFMCdtAQ3qALgdwPagLaIJYB2ammANgM4mgAm0AxmcgqjKBZIgA4KYBmSQgCgQoTACMAVg1QAuUEVRw+ietCqJCNNAE8eSMvkQV1AOhHALEGDqQoAbnFsV8OfE1gAaQdr6ZYaGw4mBSooPSYOMHE9MbqVqphrAgUiDjQ5kKoeggAQviwNOA5oAC8oADeQqCg6EQA5hTyAEwA3EIAvu1CisqqeQU0AJKESrAqapXVtQ1NoG2dQkIRhKGg4oMAjPL5hcX65RUzhI0toF3LmKthG4XNO4MjYxMIh8en8+fdorkMiACuJggOQAyvRYPguGF8Bp2KhYP96Kh-rBEGRdPoKDpQtAcJ4rPhUAByKhcEIucRkFjYXqwNwAD0C0AKoEB1MwmRWa1uNAAzA9Ck8+pNyjzNt8wFBoLZxJhWOx-lwybAwtB6UotA0xMkArSXhotBizFZ9gg0UYTFQaNhWDDQPYjApRnATEj8FcjRRvOhIO5oATneN+lROI4kKAANbSrCFTLZfQAeXQ6LehEwSJRhDR8nh-wQHVAADJQLsijl2vGEAAlCREMqVUBpjOwLNkeQqSj5oslx6Bl7dPX9UAABWgqnTEdAao1NCopdNUxqETImBRfH+bbQCOg7RqfEM6nbaJM7Q6PT7Q4Awr76FHiNPoFo573nkOqkvyKvxhuj53d6B93wQ8AOPHdFiEKkwkwZN5CTFMGzqE45mabwm2RFtsy3PMvgg6AwnoG873ka98FvR96yORCPhQ8JPzXH8QM7bxAOAjsgQuE1ODCVJ8Bob0EHgCIokfbQdFXVkgUHNQqEwRwAkrBJDDiChTFAEEeHofA+FItEyB0bxxD+NlQDE-4ZjIdF6jw9Y8LGKdYFgfwrHSChUislTQCGARTNASBZLgMQ5KZADyBXKj7Mc2AvRM8TYmEUQTAQPz0GBHgwQhKFwk0UAuEch06DQF0As0bRghQPx6DZGhnPUNz1FqGBiBjCMtTqeUpPqwwo1AEiyMITJoPggjSLvdphr6+tBolUAE0IBA8EkfxaC0vg4EfSZDIwaByMrAwLXq+wqA6igEhQVhEGhC9pLsXgeGIEqjT25SbvCFcTBocxRCgO10k0KgfLiqd1REwQnVfDbbDoRhkC1QkEnYBgrm0VBXAyJYOtAABpQkNUXHKUSi+RZXIMdCFPdGroQbHUFx99aJXFF5FCCETnJqwRmCuUYACWIgUQR64rTG4EAIzQrO0VdUBcAr+AJKXaAYDwLvdfqll24dFS4WxDmmZd-CZ+EGlPbp1c17W8dQTBsXkQh-hwQzYGNpZRAAEWgO6aC1D1TICepMGPbxbStFa1sISYIg3bRDKQKwyRcFGwyW-m5vqZXHFUgAJaDoCCvwAi4f5KVIvSgbj6BqtEStosJElw02uzYgs6g8G65IcFBjrMlEWbeAEZIbLWeAKC-a684R5kTgMdF+GC8urKsXn6uQVdDSr+0jsp6Kg7hVRJ388YwqsVh4EQbQ7X5v3MG0LgmEmS2d5VWRnbASAaa4JoQFCXf9-3aDTCE4AABHPMoQVYUGALyAA7M0XkUDeQAFZgBV3BJCVAABaY6aDDpoKrsAeBzQABsAAOZopCAAMABifBxDSHNDIUIIAA)
 	- #+BEGIN_NOTE
 	  Use `interface` if possible, unless need specific features with `type`
 	  #+END_NOTE
@@ -91,3 +92,126 @@
 	- #+BEGIN_NOTE
 	  `interfaces` has better error message than `type`
 	  #+END_NOTE
+	- **Declaration**
+		- #+BEGIN_NOTE
+		  `interfaces` are open and `type` are closed, it means interface can be declare a **second time** while type can't 
+		  #+END_NOTE
+			- ```ts
+			  interface Kitten {
+			    purrs: boolean;
+			  }
+			  
+			  interface Kitten {
+			    colour: string;
+			  }
+			  
+			  // In the other case a type cannot be changed outside of
+			  // its declaration.
+			  
+			  // error: Duplicate identifier 'Puppy'.
+			  type Puppy = {
+			    color: string;
+			  };
+			  
+			  // error: Duplicate identifier 'Puppy'.
+			  type Puppy = {
+			    toys: number;
+			  };
+			  ```
+- #### Type Union #TypeScript/Type #TypeScript/Union #[[TypeScript/Composing Types]]
+	- describe a set of `string`, `number` literals
+		- ```ts
+		  type WindowStates = "open" | "closed" | "minimized";
+		  type LockStates = "locked" | "unlocked";
+		  type PositiveOddNumbersUnderTen = 1 | 3 | 5 | 7 | 9;
+		  ```
+	- function that takes either a `string` or a `string` array
+		- ```ts
+		  function getLength(obj: string | string[]) {
+		    return obj.length;
+		  }
+		  ```
+- #### Getting type of a variable #TypeScript/Type
+	- |Type|Predicate|
+	  |--|--|
+	  |`string`|`typeof s === "string"`|
+	  |`number`|`typeof n === "number"`|
+	  |`boolean`|`typeof b === "boolean"`|
+	  |`undefined`|`typeof undefined === "undefined"`|
+	  |`function`|`typeof f === "function"`|
+	  |`array`|`Array.isArray(a)`|
+	- ==Example== function that depend on the type of the passed parameters
+		- ```ts
+		  function wrapInArray(obj: string | string[]) {
+		    if (typeof obj === "string") {
+		      return [obj];
+		              // (parameter) obj: string
+		    }
+		    return obj;
+		  }
+		  ```
+- #### Generics #TypeScript/Type #[[TypeScript/Composing Types]] #TypeScript/Generics
+	- #+BEGIN_NOTE
+	  Generic `<>` provide variables to types.
+	  #+END_NOTE
+	- ==Example==
+		- ```ts
+		  interface Backpack<Type> {
+		    add: (obj: Type) => void;
+		    get: () => Type;
+		  }
+		  
+		  // object is a string, because we declared it above as the variable part of Backpack.
+		  const object = backpack.get();
+		   
+		  // Since the backpack variable is a string, you can't pass a number to the add function.
+		  backpack.add(23);
+		  // Argument of type 'number' is not assignable to parameter of type 'string'.2345Argument of type 'number' is not assignable to parameter of type 'string'.
+		  ```
+- #### Structural Typing
+	- #+BEGIN_IMPORTANT
+	  If two objects have the same shape, they are considered to be of the **same type**.
+	  #+END_IMPORTANT
+	- ==Example==
+		- ```ts
+		  interface Point {
+		    x: number;
+		    y: number;
+		  }
+		  
+		  function logPoint(p: Point) {
+		    console.log(`${p.x}, ${p.y}`);
+		  }
+		  
+		  // logs "12, 26"
+		  const point = { x: 12, y: 26 };
+		  logPoint(point);
+		  ```
+		- it only requires a subset of the object for the **shape-matching**
+			- ```ts
+			  const point3 = { x: 12, y: 26, z: 89 };
+			  logPoint(point3); // logs "12, 26"
+			  ```
+			- ```ts
+			  const color = { hex: "#187ABF" };
+			  logPoint(color);
+			  /* Argument of type '{ hex: string; }' is not assignable to parameter of type 'Point'.
+			    Type '{ hex: string; }' is missing the following properties from type 'Point': x, y2345Argument of type '{ hex: string; }' is not assignable to parameter of type 'Point'.
+			    Type '{ hex: string; }' is missing the following properties from type 'Point': x, y */
+			  ```
+		- ==Class example==
+			- ```ts
+			  
+			  class VirtualPoint {
+			    x: number;
+			    y: number;
+			   
+			    constructor(x: number, y: number) {
+			      this.x = x;
+			      this.y = y;
+			    }
+			  }
+			   
+			  const newVPoint = new VirtualPoint(13, 56);
+			  logPoint(newVPoint); // logs "13, 56"
+			  ```
