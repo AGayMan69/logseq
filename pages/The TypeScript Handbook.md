@@ -66,6 +66,7 @@
 				- Enable the `strictNullChecks` flag makes handling `null` and `undefined` more explicit
 - #### Section 2: Everyday Types
   id:: 648ae690-8493-430f-8442-cf5dc891a873
+  collapsed:: true
 	- #### Function Annotation #TypeScript/Type #TypeScript/Function
 		- **Anonymous Function**
 			- TypeScript determine how it's going to *be called*, the parameters of that function are inferred
@@ -528,6 +529,7 @@
 	-
 - #### Section 3: Narrowing
   id:: 64912b20-5104-4737-887a-a7c4d1466a85
+  collapsed:: true
 	- #### `typeof` type guards #[[TypeScript/Type Guard]] #TypeScript/Narrowing
 		- `typeof` return a certain set of string:
 			- |**Return**||
@@ -773,4 +775,131 @@
 			  }
 			  ```
 	- #### Using type predicates #[[TypeScript/Type Predicate]]
-		- A predicate takes the form `parameterName is Type` where `parameterName` must be the name of a parameter from the current function signature
+		- For defining a *user-defined type guard*, a predicate takes the form `parameterName is Type` where `parameterName` must be the name of a parameter from the current function signature
+		- ==Example==
+			- ```ts
+			  function isFish(pet: Fish | Bird): pet is Fish {
+			    return (pet as Fish).swim !== undefined;
+			  }
+			  ```
+			- ```ts
+			  const zoo: (Fish | Bird) [] = [getSmallPet(), getSmallPet(), getSmallPet()];
+			  const underWater1: Fish[] = zoo.filter(isFish);
+			  // or, equivalently
+			  const underWater2: Fish[] = zoo.filter(isFish) as Fish[];
+			  
+			  // more complex examples
+			  const underWater3: Fish[] = zoo.filter((pet): pet is Fish => {
+			  	if (pet.name === "sharkey") return false;
+			  	return isFish(pet);
+			  });
+			  ```
+		- #+BEGIN_NOTE
+		  classes can also use [`this is Type`](https://www.typescriptlang.org/docs/handbook/2/classes.html#this-based-type-guards) to narrow their type 
+		  #+END_NOTE
+	- #### Assertion functions #TypeScript/Narrowing
+		- Types can also be narrowed using [Assertion function](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-7.html#assertion-functions)
+	- #### Discriminated unions #TypeScript/Narrowing #Typescript/Interface #TypeScript/Discrimination
+		- Most of the time in JavaScript we'll be dealing with slightly more complex structure
+		- ==Example==
+			- ```ts
+			  // attempt 1
+			  interface Shape {
+			    kind: "circle" | "square";
+			    radius?: number;
+			    sideLength?: number;
+			  }
+			  ```
+			- ```ts
+			  function getArea(shape: Shape) {
+			    if (shape.kind === "circle") {
+			      return Math.PI * shape.radius ** 2;
+			      // 'shape.radius' is possibly 'undefined'.18048'shape.radius' is possibly 'undefined'.
+			    }
+			  }
+			  ```
+			- Since the type checkers doesn't know that radius must be exists on circle (which we didn't provide sufficient information)
+			- ```ts
+			  // attempt 2
+			  interface Circle {
+			    kind: "circle";
+			    radius: number;
+			  }
+			  
+			  interface Square {
+			    kind: "square";
+			    sideLength: number;
+			  }
+			  
+			  type Shape = Circle | Square;
+			  ```
+			- ```ts
+			  function getArea(shape: Shape) {
+			    if (shape.kind === "circle") {
+			      return Math.PI * shape.radius ** 2;
+			      				// (parameter) shape: Circle
+			    }
+			  }
+			  ```
+			- This got rid of the error
+			- #+BEGIN_NOTE
+			  When every type in a union contains a common property with literal types, TypeScript considers that to be a **discriminated union**, and can *narrow* out the members of the union
+			  #+END_NOTE
+			- In this case, `kind` was that common property (which considered a **discriminant** property of *Shape*). Which narrowed `shape` down to the type `Circle`
+			- ==Switch case example==
+				- ```ts
+				  function getArea(shape: Shape) {
+				    switch (shape.kind) {
+				      case "circle":
+				        return Math.PI * shape.radius ** 2;
+				        				// (parameter) shape: Circle
+				      case "square":
+				        return shape.sideLength ** 2;
+				        	// (parameter) shape: Square
+				    }
+				  }
+				  ```
+	- #### The `never` type #TypeScript/Never #TypeScript/Narrowing
+		- Whenever you narrowing of union, which have removed all possibilities and have nothing left. TypeScript will use a `never` type to represent
+	- #### Exhaustiveness checking #TypeScript/Narrowing #TypeScript/Never
+		- We can use `never` to do exhaustive checking
+		- ==Example==
+			- ```ts
+			  type Shape = Circle | Square;
+			  
+			  function getArea(shape: Shape) {
+			    switch (shape.kind) {
+			      case "circle":
+			        return Math.PI * shape.radius ** 2;
+			      case "square":
+			        return shape.sideLength ** 2;
+			      default:
+			        const _exhaustiveCheck: never = shape;
+			        return _exhaustiveCheck;
+			    }
+			  }
+			  ```
+			- Adding a new member (which narrow in the return *never* in switch statement)to the `Shape` union will cause an error.
+				- ```ts
+				  interface Triangle {
+				    kind: "triangle";
+				    sideLength: number;
+				  }
+				  
+				  type Shape = Circle | Square | Triangle
+				  
+				  function getArea(shape: Shape) {
+				    switch (shape.kind) {
+				      case "circle":
+				        return Math.PI * shape.radius ** 2;
+				      case "square":
+				        return shape.sideLength ** 2;
+				      default:
+				        const _exhaustiveCheck: never = shape;
+				        return _exhaustiveCheck;
+				        /* Type 'Triangle' is not assignable to type 'never'.2322Type 'Triangle' is not assignable to type 'never'.
+				        return _exhaustiveCheck; */
+				  }
+				  ```
+- #### Section 4: More on Functions
+  id:: 64927755-385c-43d8-891e-da43e66063ea
