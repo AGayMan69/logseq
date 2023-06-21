@@ -171,4 +171,10 @@
 			  }
 			  ```
 	- #### Promise rejection events #Javascript/Promises #JavaScript/Async
-		-
+		- #+BEGIN_NOTE
+		  If a promise rejection event is not handled by any handler, it bubbles to the top of the call stack
+		  #+END_NOTE
+		- Whenever a *promise* is rejected, one of the two events is sent to the global scope(either `window` or `Worker`)
+		- The two event are `unhandledrejection` and `rejectionhandled`
+			- `unhandledrejection`
+				- Sent when a promise is rejected but there is no rejection handler available
