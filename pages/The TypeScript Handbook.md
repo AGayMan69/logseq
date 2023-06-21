@@ -499,4 +499,278 @@
 			    consolo.log(x!.toFixed());
 			  }
 			  ```
+		- #+BEGIN_WARNING
+		  This doesn't change the runtime behaviour of the code, it's important to **only** use `!` when the value you know *can't be* `null` or `undefined`
+		  #+END_WARNING
+	- #### Enums #TypeScript/Enum
+		- *Enum* is added by TypeScript to allows for describing a value which could be one of a set of possible named constants
+	- #### Less Common Primitives #[[TypeScript/Primitive Types]]
+		- `bigint`
+			- Introduced at *ES2020* onwards, used for very large integers, `BigInt`
+			- ```ts
+			  // Creating a bigint via the BigInt function
+			  const oneHundred: bigint = BigInt(100);
+			  
+			  // Creating a BigInt via the literal syntax
+			  const anotherHundred: bigint = 100n;
+			  ```
+		- `symbol`
+			- used to create a globally unique reference, `Symbol()`
+			- ```ts
+			  const firstName = Symbol("name");
+			  const secondName = Symbol("name");
+			  
+			  if (firstName === secondName) {
+			    // This comparison appears to be unintentional because the types 'typeof firstName' and 'typeof secondName' have no overlap.2367This comparison appears to be unintentional because the types 'typeof firstName' and 'typeof secondName' have no overlap.
+			    // Can't ever happen
+			  }
+			  ```
 	-
+- #### Section 3: Narrowing
+  id:: 64912b20-5104-4737-887a-a7c4d1466a85
+	- #### `typeof` type guards #[[TypeScript/Type Guard]] #TypeScript/Narrowing
+		- `typeof` return a certain set of string:
+			- |**Return**||
+			  |--|--|
+			  |`"string"`||
+			  |`"number"`||
+			  |`"bigint"`||
+			  |`"symbol"`||
+			  |`"undefined"`||
+			  |`"object"`||
+			  |`"function"`||
+		- #+BEGIN_NOTE
+		  In TypeScript, checking against the value returned by `typeof` is a type guard
+		  #+END_NOTE
+		- Notice that `typeof` doesn't return the string `null`
+			- ```ts
+			  function printAll(strs: string | string[] | null) {
+			    if (typeof strs === "object") {
+			      for (const s of strs) {
+			  // 'strs' is possibly 'null'.18047'strs' is possibly 'null'.
+			        console.log(s);
+			      }
+			    } else if (typeof strs === "string") {
+			      console.log(strs);
+			    } else {
+			      // do nothing
+			    }
+			  }
+			  ```
+			- That's why we need **"truthiness" checking**
+	- #### Truthiness narrowing #TypeScript/Narrowing #[[TypeScript/Truthiness]]
+		- In JavaScript, the following values are all coerced to *false*
+			- |**Values**||
+			  |--|--|
+			  |`0`||
+			  |`NaN`||
+			  |`""` (the empty string)||
+			  |`On` (the `bigint` version of zero)||
+			  |`null`||
+			  |`undefined`||
+		- `Boolean` function can coerced the value to type *boolean*
+			- ```ts
+			  // both these result in 'true'
+			  Boolean("hello"); // type: boolean, value: true
+			  !!"world"; // type: true, value: true
+			  ```
+			- This is used to added for type guarding against `null` or `undefined`
+				- ```ts
+				  function printAll(strs: string | string [] | null) { 
+				    	// this got rid of the error: 'TypeError: null is not iterable'
+				  	if (strs && typeof strs === "object") {
+				        for (const s of strs) {
+				          console.log(s);
+				        } else if (typeof strs === "string") {
+				          console.log(strs);
+				        }
+				      }
+				  }
+				  ```
+			- #+BEGIN_WARNING
+			  Don't do this !
+			  #+END_WARNING
+				- ```ts
+				  function printAll(strs: string | string[] | null) {
+				    // DON'T DO THIS !!!!
+				    if (strs) {
+				      if (typeof strs === "object") {
+				        for (const s of strs) {
+				          console.log(s);
+				        }
+				      } else if (typeof strs === "string") {
+				        console.log(strs);
+				      }
+				    }
+				  }
+				  ```
+				- There's a subtle downside: *we may no longer check for empty string case*
+		- Boolean negations with `!`
+			- it filter out from negated branches
+			- ```ts
+			  function multiplyAll(
+			    values: number[] | undefined,
+			    factor: number
+			  ): number[] | undefined {
+			    if (!values) {
+			      return values;
+			    } else {
+			      return values.map((x) => x * factor);
+			    }
+			  }
+			  ```
+	- #### Equality narrowing #TypeScript/Narrowing #TypeScript/Equality
+		- TypeScript uses *switch* statements and equality checks like `===`, `!==`, `==` and `!=`
+			- ```ts
+			  unction example(x: string | number, y: string | boolean) {
+			    if (x === y) {
+			      // We can now call any 'string' method on 'x' or 'y'.
+			      x.toUpperCase();
+			            (method) String.toUpperCase(): string
+			      y.toLowerCase();
+			            (method) String.toLowerCase(): string
+			    } else {
+			      console.log(x);
+			                 (parameter) x: string | number
+			      console.log(y);
+			                 (parameter) y: string | boolean
+			    }
+			  }
+			  ```
+		- Effective way of correctly removes the `null` from the type of `strs`
+			- ```ts
+			  function printAll(strs: string | string[] | null) {
+			    if (strs !== null) {
+			      if (typeof strs === "object") {
+			        for (const s of strs) {
+			          			// (parameter) strs: string[]
+			          console.log(s);
+			        }
+			      } else if (typeof strs === "string") {
+			        console.log(strs);
+			        				// (parameter) strs: string
+			      }
+			    }
+			  }
+			  ```
+		- `== null` checks whether it's potentially `undefined` or `null`, the same applies to `== undefined`
+			- ```ts
+			  interface Container {
+			    value: number | null | undefined;
+			  }
+			  
+			  function mutiplyValue(container: Container, factor: number) {
+			    // Remove both 'null' and 'undefined' from the type.
+			    if (container.value != null) {
+			      console.log(container.value);
+			      						// (property) Container.value: number
+			      // now we can safely multiply 'container.value'.
+			      container.value *= factor;
+			    }
+			  }
+			  ```
+	- #### The `in` operator narrowing #TypeScript/Narrowing #[[TypeScript/Operator Narrowing]]
+		- JavaScript has an operator for determining if an object has a property with a name
+		- The **"true"** branch narrows *x*'s types which have either an optional or required property *value*
+		- The **"false"** branch narrows to types which have an optional or missing property *value*
+		- ```ts
+		  type Fish = { swim: () => void };
+		  type Bird = { fly: () => void };
+		  
+		  function move(animal: Fish | Bird) {
+		    if ("swim" in animal) {
+		      return animal.swim();
+		    }
+		    return animal.fly();
+		  }
+		  ```
+		- ```ts
+		  type Fish = { swim: () => void };
+		  type Bird = { fly: () => void };
+		  type Human = { swim?: () => void; fly?: () => void };
+		  
+		  function move(animal: Fish | Bird | Human) {
+		    if ("swim" in animal) {
+		      animal;
+		      	// (parameter) animal: Fish | Human
+		    } else {
+		      animal;
+		      	// (parameter) animal: Bird | Human
+		    }
+		  
+		  }
+		  ```
+	- #### `instanceof` narrowing #TypeScript/Narrowing #[[TypeScript/Instance of Narrowing]]
+		- `instanceof` check whether or not a value  is an "instance" of another value, more specifically, `x instanceof Foo` checks whether the *prototype* chain of x contains `Foo.prototype`
+		- ==Example==
+			- ```ts
+			  function logValue(x: Date | string) {
+			    if (x instanceof Date) {
+			      console.log(x.toUTCString());
+			      		// (parameter) x: Date
+			    } else {
+			      console.log(x.toUpperCase());
+			      		// (parameter) x: string
+			    }
+			  }
+			  ```
+	- #### Assignments  #TypeScript/Narrowing
+		- when we assign to any variable, TypeScript will looks at the right side of the assignment and *narrow* it down
+		- ```ts
+		  let x = Math.random() < 0.5 ? 10 : "Hello World!";
+		  // let x: string | number
+		  x = 1;
+		  
+		  console.log(x);
+		  		// let x: number
+		  x = "goodbye!";
+		  
+		  console.log(x);
+		  		// let x: string
+		  ```
+		- #+BEGIN_NOTE
+		  Notice that we were still able to assign a *string* to *x*. This is because the **declared type** of x is `string | number`, which is the type that *x* started with
+		   to 
+		  #+END_NOTE
+		- If we'd assigned a `boolean` to *x* we'd have seen an error since that wasn't part of the **declared type**
+		- ```ts
+		  let x = Math.random() < 0.5 ? 10 : "hello world!";
+		     let x: string | number
+		  x = 1;
+		   
+		  console.log(x);
+		             let x: number
+		  x = true;
+		  Type 'boolean' is not assignable to type 'string | number'.2322Type 'boolean' is not assignable to type 'string | number'.
+		   
+		  console.log(x);
+		             let x: string | number
+		  ```
+	- #### Control flow analysis #TypeScript/Narrowing #[[TypeScript/Control Flow]]
+		- The analysis of code based on reachability is called *control flow* analysis, TypeScript uses this flow analysis to narrow types as it encounters *type guards* and *assignments*
+		- ==Example==
+			- ```ts
+			  function example() {
+			    let x: string | number | boolean;
+			   
+			    x = Math.random() < 0.5;
+			   
+			    console.log(x);
+			               let x: boolean
+			   
+			    if (Math.random() < 0.5) {
+			      x = "hello";
+			      console.log(x);
+			                 let x: string
+			    } else {
+			      x = 100;
+			      console.log(x);
+			                 let x: number
+			    }
+			   
+			    return x;
+			          let x: string | number
+			  }
+			  ```
+	- #### Using type predicates #[[TypeScript/Type Predicate]]
+		- A predicate takes the form `parameterName is Type` where `parameterName` must be the name of a parameter from the current function signature
