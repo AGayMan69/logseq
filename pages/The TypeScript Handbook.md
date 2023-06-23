@@ -903,3 +903,63 @@
 				  ```
 - #### Section 4: More on Functions
   id:: 64927755-385c-43d8-891e-da43e66063ea
+	- #### Function Type Expression #TypeScript/Function #TypeScript/Type
+		- ```ts
+		  function greeter(fn: (a: string) => void) {
+		    fn("Hello, World");
+		  }
+		  
+		  function printToConsole(s: string) {
+		    console.log(s);
+		  }
+		  
+		  greeter(printToConsole);
+		  ```
+		- we can use a type alias to name a function type
+			- ```ts
+			  type GreetFunction = (a: string) => void;
+			  function greeter(fn: GreetFunction) {
+			    // ...
+			  }
+			  ```
+	- #### Call Signatures #TypeScript/Type #TypeScript/Function
+		- The function type expression syntax doesn't allow for declaring properties like in JavaScript (functions can have properties in addition to being callable)
+		- we can describe this kind of callable (with properties) with `call signature`
+			- ```ts
+			  type DescribableFunction = {
+			    description: string;
+			    (someArg: number): boolean;
+			  };
+			  
+			  function doSomething(fn: DescribableFunction) {
+			    console.log(fn.description + " returned " + fn(6));
+			  }
+			  
+			  function myFunc(someArg: number) {
+			    return someArg > 3;
+			  }
+			  
+			  myFunc.description = "default description";
+			  
+			  doSomething(myFunc);
+			  ```
+	- #### Construct Signatures #TypeScript/Function #TypeScript/Type
+		- In TypeScript, we can add the `new` keyword in front of a call signature to write a `construct signature`
+			- ```ts
+			  type SomeConstructor = {
+			    new (s: string): SomeObject;
+			  };
+			  
+			  function fn(ctor: SomeConstructor) {
+			    return new ctor("hello");
+			  }
+			  ```
+		- `Date` object example
+			- ```ts
+			  interface CallOrConstruct {
+			    new (s: string): Date;
+			    (n?: number): string;
+			  }
+			  ```
+	- #### Generic Functions #TypeScript/Type #TypeScript/Function #TypeScript/Generics
+		- In TypeScript
