@@ -962,4 +962,31 @@
 			  }
 			  ```
 	- #### Generic Functions #TypeScript/Type #TypeScript/Function #TypeScript/Generics
-		- In TypeScript
+		- In TypeScript, *generics* are used when we want to describe a correspondence between two values
+		- By declaring a *type* parameter in the function signature
+			- ```ts
+			  function firstElement<Type>(arr: Type[]): Type | undefined {
+			    return arr[0];
+			  }
+			  ```
+		- After adding a type parameter `Type` to this function, the link between the input and the output of the function are created. Whenever we call it, a more specific type comes out
+			- ```ts
+			  // s is of type 'string'
+			  const s = firstElement(["a", "b", "c"]);
+			  // n is of type 'number'
+			  const n = firstElement([1, 2, 3]);
+			  // u is of type undefined
+			  const u = firstElement([]);
+			  ```
+	- #### Inference #TypeScript/Type #TypeScript/Generics
+		- We don't have to specify `Type`, the type was *inferred* by TypeScript
+		- multiple type parameters example
+			- ```ts
+			  function map<Input, Output>(arr: Input[], func: (arg: Input => Output): Output[] {
+			    return arr.map(func);
+			  })
+			  
+			  // Parameter 'n' is of type 'string'
+			  // 'parsed' is of type 'number[]'
+			  const parsed = map(["1", "2", "3"], (n) => parseInt(n));
+			  ```
