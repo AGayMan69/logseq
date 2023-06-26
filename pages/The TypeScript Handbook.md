@@ -944,6 +944,7 @@
 			  doSomething(myFunc);
 			  ```
 	- #### Construct Signatures #TypeScript/Function #TypeScript/Type
+		- In JavaScript, functions can be invoked with the `new` keyword, TypeScript *refers* to these as *constructor* because they created a new object
 		- In TypeScript, we can add the `new` keyword in front of a call signature to write a `construct signature`
 			- ```ts
 			  type SomeConstructor = {
@@ -989,4 +990,6 @@
 			  // Parameter 'n' is of type 'string'
 			  // 'parsed' is of type 'number[]'
 			  const parsed = map(["1", "2", "3"], (n) => parseInt(n));
+			  // In this case, type `Input`: "string", type `Output`: "number"
 			  ```
+	-
