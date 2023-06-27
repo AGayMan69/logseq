@@ -992,4 +992,131 @@
 			  const parsed = map(["1", "2", "3"], (n) => parseInt(n));
 			  // In this case, type `Input`: "string", type `Output`: "number"
 			  ```
-	-
+	- #### Constraint #TypeScript/Generics
+		- To limit the functions on a certain subset of *values*, we *constrain* the type parameter to that **type** by writing an `extends` clause
+			- ==Example==
+				- ```ts
+				  function longest<Type extends { length: number }>(a: Type, b: Type) {
+				    if (a.length > b.length) {
+				      return a;
+				    } else {
+				      return b;
+				    }
+				  }
+				  
+				  // longerArray is of type 'number[]'
+				  const longerArray = longest([1, 2], [1, 2, 3]);
+				  
+				  // longerString is of type 'alice' | 'bob'
+				  const longerString = longest("alice", "bob");
+				  
+				  // Error! Numers don't have a 'length' property
+				  const notOK = longest(10, 100);
+				  // Argument of type 'number' is not assignable to parameter of type '{ length: number; }'.2345Argument of type 'number' is not assignable to parameter of type '{ length: number; }'.
+				  ```
+				- Because we *constrained* `Type` to `{ length: number }`, we allowed to access the `.length` property of the `a` and `b` parameters
+			- [[#red]]==Wrong example==
+				- ```ts
+				  function minimumLength<Type extends { length: number }>(
+				    obj: Type,
+				    minimum: number
+				  ): Type {
+				    if (obj.length >= minimum) {
+				      return obj;
+				    } else {
+				      return { length: minimum };
+				  /*Type '{ length: number; }' is not assignable to type 'Type'.
+				    '{ length: number; }' is assignable to the constraint of type 'Type', but 'Type' could be instantiated with a different subtype of constraint '{ length: number; }'.2322Type '{ length: number; }' is not assignable to type 'Type'.
+				    '{ length: number; }' is assignable to the constraint of type 'Type', but 'Type' could be instantiated with a different subtype of constraint '{ length: number; }'.
+				    }
+				    */
+				  } 
+				  ```
+				- The problem in this function is that it promises to return the **same** kind of object as was passed in, not just some object that *match* the constraint
+	- #### Manually specifying the type #TypeScript/Type #TypeScript/Generics
+		- Sometimes TypeScript can't infer the intended type arguments in a generic call
+			- ```ts
+			  function combine<Type>(arr1: Type[], arr2: Type[]): Type[] {
+			    return arr1.concat(arr2);
+			  }
+			  
+			  const arr = combine([1, 2, 3], ["hello"]);
+			  // Type 'string' is not assignable to type 'number'.2322Type 'string' is not assignable to type 'number'.
+			  ```
+		- We have to manually **specify the type**
+			- ```ts
+			  const arr = combine<string | number>([1, 2, 3], ["hello"]);
+			  ```
+	- #### Writing Good Generics function #TypeScript/Type #TypeScript/Generics
+		- ==Example 1==
+			- ```ts
+			  function firstElement1<Type>(arr: Type[]) {
+			    return arr[0];
+			  }
+			  
+			  function firstElement2<Type extends any[]>(arr: Type) {
+			    return arr[0];
+			  }
+			  
+			  // a: number (pog)
+			  const a = firstElement1([1, 2, 3]);
+			  // b: any (deadge)
+			  const b = firstElement2([1, 2, 3]);
+			  ```
+			- The `firstElement2`'s inferred return type is `any` because TypeScript has to resolve the `arr[0]` expression using the constraint type
+		- ==Example 2==
+			- ```ts
+			  function filter1<Type>(arr: Type[], func: (arg: Type) => boolean): Type[] {
+			    return arr.filter(func)
+			  }
+			  
+			  function filter2<Type, Func extends (args: Type) => boolean>(
+			  	arr: Type[],
+			      func: Func
+			  ): Type[] {
+			      return arr.filter(func);
+			  }
+			  ```
+			- the type parameter `Func` *doesn't relate two values*, the callers need to specify type arguments manually, `Func` doesn't do anything
+		- ==Example 3==
+			- ```ts
+			  // bro why
+			  function greet<Str extends string>(s: Str) {
+			    console.log("Hello, " + s);
+			  }
+			  
+			  greet("world");
+			  
+			  // do this bro
+			  function greet(s: string) {
+			    console.log("Hello, " + s);
+			  }
+			  ```
+		- #+BEGIN_NOTE
+		  type parameters are for relating the types of multiple values, *strongly reconsider* if you actually need it
+		  #+END_NOTE
+	- #### More about optional #TypeScript/Function #TypeScript/Optional
+		- TypeScript can also take a variable number of arguments by using *optional*
+			- ```ts
+			  function f(x?: number) {
+			    // ...
+			  }
+			  
+			  f(); // OK
+			  f(10); // OK
+			  ```
+		- Although the parameter is specified as type `number`, the `x` parameter actually have the type `number | undefined`
+		- A *default* value can also be set
+			- ```ts
+			  function f(x = 10) {
+			    // ...
+			  }
+			  ```
+		- [[#red]]==Common mistake==
+			- ```ts
+			  function myForEach(arr: any[], callback: (arg: any, index?: number) => void) {
+			    for (let i = 0; i < arr.length; i++) {
+			      callback(arr[i], i);
+			    }
+			  }
+			  ```
