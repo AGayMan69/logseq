@@ -1709,23 +1709,211 @@
 			  
 			  
 			  ```
-		- Difference between interfaces & type alias
+	- #### Object generic type #TypeScript/object #TypeScript/Generics
+		- ```ts
+		  interface Box {
+		    contents: any;
+		  }
+		  
+		  let x: Box = {
+		    contents: "hello world",
+		  };
+		  
+		  // we could check 'x.contents'
+		  if (typeof x.contents === "string") {
+		    console.log(x.contents.toLowerCase());
+		  }
+		  
+		  // or we could use a type assertion
+		  console.log((x.contents as string).toLowerCase());
+		  ```
+		- Generic for having different `Box` types for every type of `contents`
+		- ```ts
+		  interface Box<Type> {
+		    content: Type;
+		  };
+		  
+		  type Box<Type> = {
+		    contents: Type;
+		  };
+		  ```
+		- Using *type aliases* to write generic helper types
 			- ```ts
-			  interface Box {
-			    contents: any;
-			  }
+			  type OrNull<Type> = Type | null;
 			  
-			  let x: Box = {
-			    contents: "hello world",
-			  };
+			  type OneOrMany<Type> = Type | Type[];
 			  
-			  // we could check 'x.contents'
-			  if (typeof x.contents === "string") {
-			    console.log(x.contents.toLowerCase());
-			  }
-			  
-			  // or we could use a type assertion
-			  console.log((x.contents as string).toLowerCase());
+			  type OneOrManyOrNull<Type> = OrNull<OneOrMany<Type>>;
+			  		// type OneOrManyOrNull<Type> = OneOrMany<Type> | null
+			  type OneOrManyOrNullStrings = OneOrManyOrNull<string>;
+			  			// type OneOrManyOrNullStrings = OneOrMany<string> | null
 			  ```
-	-
+		- Common example (Array)
+			- ```ts
+			  function doSomething(value: Array<string>) {
+			    // ...
+			  }
+			  
+			  let myArray: string[] = ["hello", "world"];
+			  
+			  // either of these work!
+			  doSomething(myArray);
+			  doSomething(new Array("hello", "world"));
+			  ```
+		- #+BEGIN_NOTE
+		  JavaScript provides many other data structures which are generic, like `Map<K, V>`, `Set<T>`, and `Promise<T>`.
+		  #+END_NOTE
+	- #### `ReadonlyArray` #TypeScript/object #TypeScript/Generics #TypeScript/Array
+		- The `ReadonlyArray` is a special type that describes arrays that shouldn't be changed
+			- function doStuff(values: ReadonlyArray<string>) {
+			    // We can read from 'values' ...
+			    const copy = values.slice();
+			    console.log(`The first value is ${values[0]}`);
+			    
+			    // ...but we can't mutate 'values'.
+			    values.push("hello!");
+			    // Property 'push' does not exist on type 'readonly string[]'.
+			  }
+		- #+BEGIN_WARNING
+		  Unlike `Array`, there isn't a `ReadonlyArray` constructor that can use
+		  #+END_WARNING
+			- ```ts
+			  new ReadonlyArray("red", "green", "blue");
+			  // 'ReadonlyArray' only refers to a type, but is being used as a value here.
+			  
+			  
+			  // we can assign the regular array to `ReadonlyArray`
+			  const roArray: ReadonlyArray<string> = ["red", "green", "blue"];
+			  ```
+		- Just like `Type[]`, TypeScript provides a shorthand for `ReadonlyArray<Type>` with `readonly Type[]`
+			- ```ts
+			  function doStuff(values: readonly string[]) {
+			    // We can read from 'values' ...
+			    const copy = value.slice();
+			    console.log(`The first value is ${values[0]}`);
+			    
+			    // can't mutate 'values'.
+			    values.push("hello!");
+			    // Property 'push' does not exist on type 'readonly string[]'.
+			  }
+			  ```
+		- `readonly`'s assignability isn't bidirectional between regular `Array` and `ReadonlyArray`
+			- ```ts
+			  let x: readonly string[] = [];
+			  let y: string[] = [];
+			  
+			  x = y;
+			  y = x;
+			  
+			  // The type 'readonly string[]' is 'readonly' and cannot be assigned to the mutable type 'string[]'.
+			  ```
+	- #### Tuple Type #TypeScript/Type #TypeScript/Array
+		- A `tuple` *type* is another `Array` that knows exactly know how many *elements* it contain, exactly *which types* it contains at **specific position**
+			- ```ts
+			  type StringNumberPair = [string, number];
+			  ```
+		- It describes arrays whose `0` index contains a `string` and whose `1` index contains a `number`
+			- ```ts
+			  function doSomething(pair: [string, number]) {
+			    const a = pair[0];
+			    	// const a: string
+			    const b = pair[1];
+			    	// const b: number
+			  }
+			  
+			  doSomething(["hello", 42]);
+			  ```
+			- ```ts
+			  function doSomething1(pair: [string, number]) {
+			    // ...
+			    const c = pair[2];
+			    // Tuple type '[string, number]' of length '2' has no element at index '2'.
+			  }
+			  ```
+		- Destructuring tuple
+			- ```ts
+			  function doSomething(stringHash: [string, number]) {
+			    const [inputString, hash] = stringHash;
+			    
+			    console.log(inputString);
+			    				// const inputString: string
+			    console.log(hash);
+			    			// const hash: number
+			  }
+			  ```
+			- #+BEGIN_NOTE
+			  Tuple types are useful in heavily convention-based API, this give us flexibility in whatever we want to name our variable when we destructure them
+			  #+END_NOTE
+		- Simple tuple type
+			- ```ts
+			  interface StringNumberPair {
+			    // specialized properties
+			    length: 2;
+			    0: string;
+			    1: number;
+			    
+			    // Other 'Array<string | number>' members...
+			    slice(start?: number, end?: number): Array<string | number>;
+			  }
+			  ```
+		- tuple type with optional type
+			- ```ts
+			  type Either2dOr3d = [number, number, number?];
+			  
+			  function setCoordinate(coord: Either2dOr3c) {
+			    const [x, y, z] = coord;
+			    			// const z: number | undefined
+			    
+			    console.log(`Provided coordinates had ${coord.length} dimensions`);
+			    												// (property) length: 2 | 3
+			  }
+			  ```
+		- rest elements with tupe
+			- ```ts
+			  type StringNumberBooleans = [string, number, ...boolean[]];
+			  type StringBooleansNumber = [string, ...boolean[], number];
+			  type BooleansStringNumber = [...boolean[], string, number];
+			  ```
+				- `StringNumberBooleans` describes a tuple that first two element are `string` and `number`, end with any number of `boolean`
+				  logseq.order-list-type:: number
+				- `StringBooleansNumber` describes a tuple whose first element is `string` and then any number of `boolean` and end with `number`
+				  logseq.order-list-type:: number
+				- `BooleansStringNumber` describes a tuple start with any number of `boolean` and ending with a `string`, and then a `number`
+				  logseq.order-list-type:: number
+			- this kind of tuple has no set "length" unlike normal tuple
+		- ==Why optional and rest element be useful?==
+			- It allows TypeScript to *correspond* tuples with parameter lists
+				- ```ts
+				  function readButtonInput(...args: [string, number, ...boolean[]]) {
+				    const [name, version, ...input] = args;
+				    // ...
+				  }
+				  
+				  // as an alternative to
+				  function readButtonInput(name: string, version: number, ...input: boolean[]) {
+				    // ...
+				  }
+				  ```
+		- readonly tuple
+			- ```ts
+			  function doSomething(pair: readonly [string, number]) {
+			    // ...
+			  }
+			  ```
+			- ```ts
+			  function doSomething(pair: readonly [string, number]) {
+			    pair[0] = "hello!";
+			    // Cannot assign to '0' because it is a read-only property.
+			  }
+			  ```
+			- `const` assertions will inferred the tuple types with `readonly`
+				- ```ts
+				  let point = [3, 4] as const;
+				  
+				  function distanceFromOrigin([x, y]: readonly [number, number]) {
+				    return Math.sqrt(x ** 2 + y **2);
+				  }
+				  
+				  distanceFromOrigin(point);
+				  ```
 -

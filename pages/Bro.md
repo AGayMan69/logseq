@@ -31,6 +31,7 @@
 		  logseq.order-list-type:: number
 	- These servers and resources are isolated and given limited access to the *LAN*
 	- ![What is Demiltarized Zone? - GeeksforGeeks](https://media.geeksforgeeks.org/wp-content/uploads/20220808192523/DemiltarizedZoneDMZ.png)
+		-
 	- Secured between two firewalls, *filter* exchanged data, between internal network and DMZ, traffic flowing from external network to DMZ
 		- screen data packets before they get through the servers in the DMZ
 		  logseq.order-list-type:: number
