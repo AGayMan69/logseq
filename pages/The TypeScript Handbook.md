@@ -903,6 +903,7 @@
 				  ```
 - #### Section 4: More on Functions
   id:: 64927755-385c-43d8-891e-da43e66063ea
+  collapsed:: true
 	- #### Function Type Expression #TypeScript/Function #TypeScript/Type
 		- ```ts
 		  function greeter(fn: (a: string) => void) {
@@ -1119,4 +1120,612 @@
 			      callback(arr[i], i);
 			    }
 			  }
+			  
+			  myForEach([1, 2, 3], (a, i) => {
+			    console.log(i.toFixed());
+			    // 'i' is possibly 'undefined'.18048'i' is possibly 'undefined'.
+			  })
 			  ```
+	- #### Overload signatures #TypeScript/Function
+		- In TypeScript, we can specify a function that can be called in different ways by writing *overload signatures*
+		- ==Examples==
+			- ```ts
+			  function makeDate(timestamp: number): Date;
+			  function makeDate(m: number, d: number, y: number): Date;
+			  function makeDate(mOrTimestamp: number, d?: number, y?: number): Date {
+			    if (d !== undefined && y !== undefined) {
+			      return new Date(y, mOrTimestamp, d);
+			    } else {
+			      return new Date(mOrTimestamp);
+			    }
+			  }
+			  
+			  const d1 = makeDate(12345678);
+			  const d2 = makeDate(5, 5, 5);
+			  const d3 = makeDate(1, 3);
+			  // No overload expects 2 arguments, but overloads do exist that expect either 1 or 3 arguments.2575No overload expects 2 arguments, but overloads do exist that expect either 1 or 3 arguments.
+			  ```
+		- The first two signatures are called the *overload signatures*, after we have an *implementation signature*, but this signature can't be called directly
+			- ```ts
+			  function fn(x: string): void;
+			  
+			  function fn() {
+			    // ...
+			  }
+			  
+			  // Expected to be able to with zero arguments
+			  fn();
+			  // Expected 1 arguments, but got 0
+			  ```
+		- #+BEGIN_NOTE
+		  The signature of the implementation is not visible from the outside. When writing an overload function, you should always have two or more signatures above the implementation of the function
+		  #+END_NOTE
+		- The implementation signature must also be **compatible** with the *overload signatures*
+		- ==Example==
+			- ```ts
+			  function fn(x: boolean): void;
+			  // Argument isn't right
+			  function fn(x: string): void;
+			  // This overload signature is not compatible with its implementation signature.
+			  function fn(x: boolean) {}
+			  ```
+			- ```ts
+			  function fn(x: string): string;
+			  // Return type isn't right
+			  function fn(x: number): boolean;
+			  // This overload signature is not compatible with its implementation signature.
+			  function fn(x: string | number) {
+			    return "oops";
+			  }
+			  ```
+		- ##### Guidelines of using function overload
+			- Consider a function that return the length of a `string` or an `array`:
+				- ```ts
+				  function len(s: string): number;
+				  function len(arr: any[]): number;
+				  function len(x: any) {
+				    return x.length;
+				  }
+				  ```
+				- ```ts
+				  len(""); // OK
+				  len([0]); // OK
+				  len(Math.random() > 0.5 ? "hello" : [0]);
+				  /* Overload 1 of 2, '(s: string): number', gave the following error.
+				      Argument of type 'number[] | "hello"' is not assignable to parameter of type 'string'.
+				        Type 'number[]' is not assignable to type 'string'.
+				    Overload 2 of 2, '(arr: any[]): number', gave the following error.
+				      Argument of type 'number[] | "hello"' is not assignable to parameter of type 'any[]'.
+				        Type 'string' is not assignable to type 'any[]'. */
+				  ```
+			- Because both overloads have the same argument count and same return type, we can *instead* write a non-overloaded version of the function
+				- ```ts
+				  function len(x: any[] | string) {
+				    return x.length;
+				  }
+				  ```
+			- #+BEGIN_NOTE
+			  Always prefer parameters with union types instead of overloads when possible
+			  #+END_NOTE
+	- #### Infer `this` #TypeScript/Function #TypeScript/Scope
+		- TypeScript will infer what the `this` should be in a function
+			- ```ts
+			  const user = {
+			    id: 123,
+			    
+			    admin: false,
+			    becomeAdmin: function () {
+			      this.admin = true;
+			    }
+			  }
+			  ```
+		- TypeScript uses that syntax space to let you declare the type for `this` in the function body
+			- ```ts
+			  interface DB {
+			    filterUsers(filter: (this: User) => boolean): User[];
+			  }
+			  
+			  const db = getDB();
+			  const admins = db.filterUsers(function (this: User) {
+			    return this.admin;
+			  });
+			  
+			  const adminbro = db.filterUsers(() => this.admin)
+			  /*
+			  The containing arrow function captures the global value of 'this'.
+			  Element implicitly has an 'any' type because type 'typeof globalThis' has no index signature.
+			  */
+			  ```
+			- #+BEGIN_NOTE
+			  arrow function can't get this behavior, use `function` if you want to have `this` as a parameter
+			  #+END_NOTE
+	- #### Return value #TypeScript/Function
+		- In Typescript, `void` represent any time a function doesn't have any `return` statement, *or* doesn't return any explicit value from those return statements
+		- However in JavaScript, a function that doesn't return any value will implicitly return the value `undefined`
+		- #+BEGIN_WARNING
+		  `void` is **not** the same as `undefined`
+		  #+END_WARNING
+	- #### Type `object` #TypeScript/Type
+		- The special type `object` isn't a primitive (`string`, `number`, `bigint`, `boolean`, `symbol`, `null` or `undefined`)
+		- #+BEGIN_NOTE
+		  This is different from the *empty object* type `{ }`, also different from the global type `Object`
+		  
+		  **Always use `object`!!!**
+		  #+END_NOTE
+	- #### Type `unknown` #TypeScript/Type
+		- The `unknown` type represents *any* value. Similar to `any` type, but is rather safer because it's not legal to **do anything** with an `unknown` value
+			- ```ts
+			  function f1(a: any) {
+			    a.b(); // OK
+			  }
+			  
+			  function f2(a: unknown) {
+			    a.b();
+			    // 'a' is of type 'unknown'.
+			  }
+			  ```
+		- This is used for describing function type without having `any` values in the function body
+			- ```ts
+			  function safeParse(s: string): unknown {
+			    return JSON.parse(a);
+			  }
+			  
+			  // Need to be careful with `obj`
+			  const obj = safeParse(someRandomString);
+			  ```
+	- #### Type `never` #TypeScript/Type #TypeScript/Never
+		- some function **never** return a value
+			- ```ts
+			  function fail(msg: string): never {
+			    throw new Error(msg);
+			  }
+			  ```
+		- The `never` type represents values which are *never* observed. In this case mean the function throw an exception or terminates execution of the program
+		- `never` also appears when TypeScript determines there's nothing left in a *union*
+			- ```ts
+			  function fn(x: string | number) {
+			    if (typeof x === "string") {
+			      // do something
+			    } else if (typeof x === "number") {
+			      // do something else
+			    } else {
+			      x; // has type 'never';
+			    }
+			  }
+			  ```
+	- #### Type `Function` #TypeScript/Type #TypeScript/Function
+		- The global type `Function` describes properties like `bind`, `call`, `apply` and others present on all function values in JavaScript
+			- ```ts
+			  function doSomething(f: Function) {
+			    return f(1, 2, 3);
+			  }
+			  ```
+			- #+BEGIN_WARNING
+			  This is an *untyped function call* having a unsafe `any` return type, it is best to avoid
+			  #+END_WARNING
+			- The type `() => void` is generally safer
+	- #### Rest parameter #TypeScript/Function
+		- Besides using optional parameters or overloads to make functions that can accept a variety of fixed argument counts
+		- *rest parameters* can take an *unbound* number of arguments
+		- *rest parameters* appears after all other parameters
+			- ```ts
+			  function multiply(n: number, ...m: number[]) {
+			    return m.map((x) => n * x);
+			  }
+			  
+			  // 'a' gets value [10, 20, 30, 40]
+			  const a = multiply(10, 1, 2, 3, 4);
+			  ```
+	- #### Spread operator #TypeScript/Function
+		- *spread syntax* can be used to *provide* a variable number of arguments from an iterable object
+			- ```ts
+			  const arr1 = [1, 2, 3];
+			  const arr2 = [4, 5, 6];
+			  arr1.push(...arr2);
+			  ```
+		- TypeScript does not assume that array are immutable
+			- ```ts
+			  // Inferred type is number[] -- "an array with zero or more numbers",
+			  // not specifically two numbers
+			  const args = [8, 5];
+			  const angle = Math.atan2(...args);
+			  // A spread argument must either have a tuple type or be passed to a rest parameter.
+			  ```
+		- fix:
+			- ```ts
+			  // Inferred as 2-length tuple
+			  const args = [8, 5] as const;
+			  // OK
+			  const angle = Math.atan2(...args);
+			  ```
+	- #### Object destructuring #TypeScript/Function #TypeScript/object
+		- In TypeScript, *object destructuring* can be used to unpack objets provided as an argument into one or more local variables in the function body
+			- ```ts
+			  function sum({ a, b, c }: { a: number; b: number; c: number }) {
+			    console.log(a + b + c);
+			  }
+			  ```
+		- can be used with named type as well
+			- ```ts
+			  // Same as prior example
+			  type ABC = { a: number; b: number; c: number};
+			  function sum({ a, b, c}: ABC) {
+			    console.log(a + b + c);
+			  }
+			  ```
+			-
+	- #### Type `void` #TypeScript/Type #TypeScript/Function
+		- The `void` return type for function can sometimes produce some unusual, but expected behavior
+		- `void` return type `(type voidFunc = () => void)`, when implemented, can return *any* other value, but it will be ignored
+		- The following implementations of the type `() => void` is valid
+			- ```ts
+			  type voidFunc = () => void;
+			  
+			  const f1: voidFunc = () => {
+			    return true;
+			  }
+			  
+			  const f2: voidFunc = () => true;
+			  
+			  const f3: voidFunc = function () {
+			    return true;
+			  }
+			  
+			  const v1 = f1();
+			  const v2 = f2();
+			  const v3 = f3();
+			  
+			  // it will all return void
+			  ```
+		- This behavior exists to make the following code is valid (`Array.prototype.push` return a number and the `Array.prototype.forEach` method expects a function with a return type of `void`)
+			- ```ts
+			  const src = [1, 2, 3];
+			  const dst = [0];
+			  
+			  src.forEach((el) => dst.push(el))
+			  ```
+		- #+BEGIN_NOTE
+		  There is one special case, when a literal function definition has a `void` return type, the function must **not** return anything
+		  #+END_NOTE
+			- ```ts
+			  function f2(): void {
+			    // @ts-expect-error
+			    return true;
+			  }
+			  
+			  const f3 = function (): void {
+			    // @ts-expect-error
+			    return true;
+			  }
+			  ```
+- #### Section 5: Object Types
+  id:: 649bd061-9cee-438d-8a74-3755f13c1d4e
+	- #### Object type refresher #TypeScript/Type #TypeScript/object #[[TypeScript/Type Alias]] #Typescript/Interface
+		- In JavaScript, the fundamental way that we group and pass around data is through objects. In TypeScript, we represent those through *object types*
+		- *anonymous object*
+			- ```ts
+			  function greet(person: { name: string; age: number }) {
+			    return "Hello " + person.name;
+			  }
+			  ```
+		- *object type by using interface*
+			- ```ts
+			  interface Person {
+			    name: string;
+			    age: number;
+			  }
+			  
+			  function greet(person: Person) {
+			    return "Hello " + person.name;
+			  }
+			  ```
+		- *object type by using type alias*
+			- ```ts
+			  type Person = {
+			    name: string;
+			    age: number;
+			  }
+			  
+			  function greet(person: Person) {
+			    return "Hello " + person.name;
+			  }
+			  ```
+	- #### Property Modifier #TypeScript/object
+		- each property in an object type can specify a couple of things:
+			- the type 
+			  logseq.order-list-type:: number
+			- whether the property is optional
+			  logseq.order-list-type:: number
+			- whether the property can be written to
+			  logseq.order-list-type:: number
+	- #### Optional Properties #TypeScript/object #TypeScript/Optional
+		- for objects that *might* have a property set. those properties can mark as *optional* by adding `?`
+			- ```ts
+			  interface PaintOptions {
+			    shape: Shape;
+			    xPos?: number;
+			    yPos?: number;
+			  }
+			  
+			  function paintShape(opts: PaintOptions) {
+			    // ...
+			  }
+			  
+			  const shape = getShape();
+			  paintShape({ shape });
+			  paintShape({ shape, xPos: 100 });
+			  paintShape({ shape, yPos: 100 });
+			  paintShape({ shape, xPos: 100, yPos: 100 });
+			  ```
+		- when we do under `strictNullChecks`, TypeScript will tell us they're potentially `undefined`
+			- ```ts
+			  function paintShape(opts: PaintOptions) {
+			    let xPos = opts.xPos;
+			                     (property) PaintOptions.xPos?: number | undefined
+			    let yPos = opts.yPos;
+			                     (property) PaintOptions.yPos?: number | undefined
+			    // ...
+			  }
+			  ```
+		- even if the property is not set, we can still access it (`undefined`)
+			- ```ts
+			  function paintShape(opts: PaintOptions) {
+			    let xPos = opts.xPos === undefined ? 0 : opts.xPos;
+			    // let xPos: number
+			    let yPos = opts.yPos === undefined ? 0 : opts.yPos;
+			    // let yPos: number
+			  }
+			  ```
+		- setting defaults
+			- ```ts
+			  function paintShape({ shape, xPos = 0, yPos = 0 }: PaintOptions) {
+			    console.log("x coordinate at", xPos);
+			    								// (parameter) xPos: number
+			    console.log("y coordinate at", yPos);
+			    								// (parameter) yPos: number
+			  }
+			  ```
+			- #+BEGIN_NOTE
+			  There is currently no way to place **type annotations** within *destructuring patterns*
+			  #+END_NOTE
+				- ```ts
+				  function draw({ shape: Shape, xPos: number = 100 /*...*/ }) {
+				    render(shape);
+				  // Cannot find name 'shape'. Did you mean 'Shape'?
+				    render(xPos);
+				  // Cannot find name 'xPos'.
+				  }
+				  ```
+				- In the object *destructuring pattern*, `shape: Shape` means "grab the property `shape` and redefine it locally as a variable named `Shape`
+	- #### `readonly` Properties #TypeScript/object
+		- Properties can be marked as `readonly`, although it cannot change any behavior during runtime, a property marked as `readonly` can't be written to during *type-checking*
+			- ```ts
+			  interface SomeType {
+			    readonly prop: string;
+			  }
+			  
+			  function doSomething(obj: SomeType) {
+			    // reading value
+			   	console.log(`prop has the value '${obj.prop}'.`);
+			    
+			    // trying to re-assign it
+			  	obj.prop = "hello";
+			    // Cannot assign to 'prop' because it is a read-only property.
+			  }
+			  ```
+		- `readonly` modifier doesn't necessarily imply that a value is totally immutable,  it just means the property itself can't be re-written to
+			- ```ts
+			  interface Home {
+			    readonly resident: { name: string; age: number };
+			  }
+			  
+			  function visitForBirthday(home: Home) {
+			    // we can read and update properties from 'home.resident'
+			    console.log(`Happy birthday ${home.resident.name}!`);
+			    home.resident.age++;
+			  }
+			  
+			  function evict(home: Home) {
+			    home.resident = {
+			      // Cannot assign to 'resident' because it is a read-only property.
+			      name: "Victor the Evictor",
+			      age: 42,
+			    };
+			  }
+			  ```
+		- TypeScript doesn't factor in whether properties on two types are `readonly` when checking whether those types are compatible
+		- `readonly`
+			- ```ts
+			  interface Person {
+			    name: string;
+			    age: number;
+			  }
+			  
+			  interface ReadonlyPerson {
+			    readonly name: string;
+			    readonly age: number;
+			  }
+			  
+			  let writablePerson: Person = {
+			    name: "Person McPersonface",
+			    age: 42,
+			  };
+			  
+			  // works
+			  let readonlTyPerson: ReadonlyPerson = writablePerson;
+			  
+			  console.log(readonlyPerson.age); // prints '42'
+			  writablePerson.age++
+			  console.log(readonlyPerson.age); // prints '43'
+			  ```
+	- #### Index Signatures #TypeScript/Never
+		- Index signatures can be used for placeholder, for no knowing the *name* of a type's properties, but only the *shape* of the value
+		- ```ts
+		  interface StringArray {
+		    [index: number]: string;
+		  }
+		  
+		  const myArray: StringArray = getStringArray();
+		  const secondItem = myArray[1];
+		  		//  const secondItem: string
+		  ```
+		- Only some types are allowed: `string`, `number`, `symbol`
+		- Index signatures also enforce that all properties match their return type
+			- ```ts
+			  interface NumberDictionary {
+			    [index: string]: number;
+			    
+			    length: number; // ok
+			    name: string;
+			    // Property 'name' of type 'string' is not assignable to 'string' index type 'number'.
+			  }
+			  ```
+		- Use union of the property types to accept different types
+			- ```ts
+			  interface NumberOfStringDictionary {
+			    [index: string]: number | string;
+			    length: number; // ok, length is a number
+			    name: string; // ok, name is a string
+			  }
+			  ```
+		- Adding `readonly` to prevent assignment to their indices
+			- ```ts
+			  interface ReadonlyStringArray {
+			    readonly [index: number]: string;
+			  }
+			  
+			  let myArray: ReadonlyStringArray = getReadOnlyStringArray();
+			  myArray[2] = "Mallory";
+			  // Index signature in type 'ReadonlyStringArray' only permits reading.
+			  ```
+	- #### Excess property checking #TypeScript/object
+		- ```ts
+		  interface SquareConfig {
+		    color?: string;
+		    width?: number;
+		  }
+		  
+		  function createSquare(config: SquareConfig): { color: string; area: number } {
+		    return {
+		      color: config.color || "red",
+		      area: config.width ? config.width * config.width : 20,
+		    };
+		  }
+		  
+		  let mySquare = createSquare({ colour: "red", width: 100 });
+		  /*
+		  Argument of type '{ colour: string; width: number; }' is not assignable to parameter of type 'SquareConfig'.
+		    Object literal may only specify known properties, but 'colour' does not exist in type 'SquareConfig'. Did you mean to write 'color'
+		  */
+		  ```
+		- In TypeScript, Object literals get special treatment and undergo *excess property checking* when assigning them to other variables
+		- if an object literal has any properties that the **"target type"** doesn't have, you'll get an error
+		- We can get around these check with *type assertion*
+			- ```ts
+			  let mySquare = createSquare({ width: 100, opacity: 0.5 } as SquareConfig);
+			  ```
+		- Another approach is using *string index signature*
+			- ```ts
+			  interface SquareConfig {
+			    color?: string;
+			    width?: number;
+			    [propName: string]: any;
+			  }
+			  ```
+		- Hacky way
+			- ```ts
+			  let squareOptions = { colour: "red", width: 100 };
+			  let mySquare = createSquare(squareOptions);
+			  ```
+			- assigning the object to another variable prevent undergo excess property checks
+		- Above approach works as long as it have a common property to the type, if not it will fail
+			- ```ts
+			  let squareOptions = { colour: "red" };
+			  let mySquare = createSquare(squareOptions);
+			  // Type '{ colour: string; }' has no properties in common with type 'SquareConfig'.
+			  ```
+	- #### Extends #TypeScript/object #TypeScript/extends
+		- for example if we want different version of the type, in this case ,more specific one, we can *extend* the original type
+			- ```ts
+			  interface BasicAddress {
+			    name?: string;
+			    street: string;
+			    city: string;
+			    country: string;
+			    postalCode: string;
+			  }
+			  
+			  interface AddressWithUnit extends BasicAddress {
+			    unit: string;
+			  }
+			  ```
+		- ==Multiple extends example==
+			- ```ts
+			  interface Colorful {
+			    color: string;
+			  }
+			  
+			  interface Circle {
+			    radius: number;
+			  }
+			  
+			  interface ColorfulCircle extends Colorful, Circle {}
+			  
+			  const cc: ColorfulCircle = {
+			    color: "red",
+			    radius: 42,
+			  }
+			  ```
+	- #### Intersection #TypeScript/object #TypeScript/intersection
+		- TypeScript provides another construct call *intersection types* to combine existing object types
+			- ==With interfaces==
+			- ```ts
+			  interface Colorful {
+			    color: string;
+			  }
+			  interface Circle {
+			    radius: number;
+			  }
+			  
+			  type ColorfulCircle = Colorful & Circle;
+			  ```
+			- ==With type alias==
+			- ```ts
+			  function draw(circle: Colorful & Circle) {
+			    console.log(`Color was ${circle.color}`);
+			    console.log(`Radius was ${circle.radius}`);
+			  }
+			  
+			  // okay
+			  draw({ color: "blue", radius: 42 });
+			  
+			  // bro 
+			  draw({ color: "red", raidus: 42 });
+			  
+			  /*
+			  Argument of type '{ color: string; raidus: number; }' is not assignable to parameter of type 'Colorful & Circle'.
+			    Object literal may only specify known properties, but 'raidus' does not exist in type 'Colorful & Circle'. Did you mean to write 'radius'?
+			  */
+			  
+			  
+			  ```
+		- Difference between interfaces & type alias
+			- ```ts
+			  interface Box {
+			    contents: any;
+			  }
+			  
+			  let x: Box = {
+			    contents: "hello world",
+			  };
+			  
+			  // we could check 'x.contents'
+			  if (typeof x.contents === "string") {
+			    console.log(x.contents.toLowerCase());
+			  }
+			  
+			  // or we could use a type assertion
+			  console.log((x.contents as string).toLowerCase());
+			  ```
+	-
+-
