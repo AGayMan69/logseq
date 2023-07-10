@@ -334,4 +334,37 @@
 		    a: 'a',
 		  }
 		  ```
-		-
+		- TypeScript will report an error if the variable is not in the specified format
+		- ```ts
+		  type X = {
+		    a: string;
+		  };
+		  
+		  const x: X = {
+		    a: 'a',
+		    b: 'b', // Error
+		  }
+		  ```
+	- **Type Assertion**
+		- add an assertion using the `as` keyword
+			- ```ts
+			  type X = {
+			    a: string;
+			  };
+			  const x ={ 
+			  	a: 'a',
+			    	b: 'b',
+			  } as X;
+			  ```
+		- ==Example==
+			- Type assertion are use to specified a type to be more specific type
+				- ```ts
+				  type j<Type> = {
+				    [Property in keyof Type as `prefix_${string & Property}`]: () => Type[Property];
+				  };
+				  type X = {
+				  	a: string;
+				  	b: number;
+				  }
+				  type Y = J<X>;
+				  ```
