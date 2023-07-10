@@ -1400,6 +1400,7 @@
 			  ```
 - #### Section 5: Object Types
   id:: 649bd061-9cee-438d-8a74-3755f13c1d4e
+  collapsed:: true
 	- #### Object type refresher #TypeScript/Type #TypeScript/object #[[TypeScript/Type Alias]] #Typescript/Interface
 		- In JavaScript, the fundamental way that we group and pass around data is through objects. In TypeScript, we represent those through *object types*
 		- *anonymous object*
@@ -1916,4 +1917,24 @@
 				  
 				  distanceFromOrigin(point);
 				  ```
--
+- #### Section 6: Type Manipulation
+  id:: 649bd07e-2018-4ed6-9dfc-39d16d7b0840
+	- #### Generics Refresher #TypeScript/Generics
+		- declaring a generic function
+			- ```ts
+			  function identity<Type>(arg: Type): Type {
+			    return arg;
+			  }
+			  ```
+		- make the function to work on arrays of `Type`
+			- ```ts
+			  function loggingIdentity<Type>(arg: Type[]): Type[] {
+			    console.log(arg.length);
+			    return arg;
+			  }
+			  
+			  // alternative way
+			  function loggingIdentity<Type>(arg: Array<T)
+			  ```
+			-
+	-
