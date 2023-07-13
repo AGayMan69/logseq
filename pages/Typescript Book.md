@@ -7,6 +7,8 @@
 		  logseq.order-list-type:: number
 		- and compile code to *JavaScript*
 		  logseq.order-list-type:: number
+		- bro
+		  logseq.order-list-type:: number
 	- Types do not affect the execution of the code in a JavaScript engine
 	- Types are completely **erased** during compilation
 	- TypeScript can still output JavaScript even with `type errors`
